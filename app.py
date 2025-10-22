@@ -160,8 +160,8 @@ st.sidebar.title("Controls")
 
 # Let user choose which pre-trained model variant to use [cite: 51]
 model_options = {
-    "Category 1: Natural (Shakespeare)": f'{BASE_DIR}/cat1_model.pt',
-    "Category 2: Structured (Linux C Code)": f'{BASE_DIR}/cat2_model.pt'
+    "Category 1: Natural (Shakespeare)": BASE_DIR / 'cat1_model.pt',
+    "Category 2: Structured (Linux C Code)": BASE_DIR / 'cat2_model.pt'
 }
 model_choice = st.sidebar.selectbox("Choose Model Variant", model_options.keys())
 model_path = model_options[model_choice]
