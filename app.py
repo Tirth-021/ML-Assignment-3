@@ -8,7 +8,7 @@ from pathlib import Path
 
 # --- Configuration ---
 # This MUST match the folder where your models are saved.
-BASE_DIR = Path(__file__).parent
+ARTIFACTS_DIR = Path(".")
 DEFAULT_CONTEXT = 10
 DEFAULT_EMBED_DIM = 128
 DEVICE = "cpu" # Force CPU for compatibility
@@ -17,7 +17,7 @@ DEVICE = "cpu" # Force CPU for compatibility
 # 1. EXACT Model Definition (Copied from your training notebook)
 # ----------------------------------------------------------------------
 # This class MUST be identical to the one you used for training.
-# Note: Your assignment asks for 1-2 hidden layers[cite: 32]. 
+# Note: Your assignment asks for 1-2 hidden layers 
 # This code assumes the 2-layer model from your notebook.
 
 class NextWordMLP(nn.Module):
@@ -102,28 +102,28 @@ def load_model(model_path):
     Loads the model and vocab. This is cached so it only runs once.
     """
     try:
-        checkpoint = torch.load(model_path, map_location=DEVICE)
+        checkpoint = torch.load(model_path, map_location=DEVICE, weights_only=False)
         
         # Recreate the exact model architecture
         vocab_size = len(checkpoint['itos'])
         
         # This resolves the assignment contradiction: we give options [cite: 51]
         # and display the params of the loaded variant[cite: 47].
-        if 'cat1' in model_path.name:
+        if 'cat1' in model_path:
             model_params = {
                 'context': DEFAULT_CONTEXT,
                 'embed_dim': DEFAULT_EMBED_DIM,
-                'h1': 512,
-                'h2': 256,
-                'dropout': 0.3
+                'h1': 1024,
+                'h2': 512,
+                'dropout': 0.4
             }
-        elif 'cat2' in model_path.name:
+        elif 'cat2' in model_path:
             model_params = {
                 'context': DEFAULT_CONTEXT,
                 'embed_dim': DEFAULT_EMBED_DIM,
-                'h1': 256,
-                'h2': 128,
-                'dropout': 0.3
+                'h1': 1024,
+                'h2': 512,
+                'dropout': 0.4
             }
         
         model = NextWordMLP(
@@ -160,8 +160,8 @@ st.sidebar.title("Controls")
 
 # Let user choose which pre-trained model variant to use [cite: 51]
 model_options = {
-    "Category 1: Natural (Shakespeare)": BASE_DIR/'cat1_model.pt',
-    "Category 2: Structured (Linux C Code)": BASE_DIR/'cat2_model.pt'
+    "Category 1: Natural (Shakespeare)": f'{ARTIFACTS_DIR}/cat1_model.pt',
+    "Category 2: Structured (Linux C Code)": f'{ARTIFACTS_DIR}/cat2_model.pt'
 }
 model_choice = st.sidebar.selectbox("Choose Model Variant", model_options.keys())
 model_path = model_options[model_choice]
@@ -179,8 +179,8 @@ if model:
 
     # --- Generation Controls ---
     st.sidebar.subheader("Generation Settings")
-    seed = st.sidebar.number_input("Random Seed", value=1337) [cite: 47]
-    temperature = st.sidebar.slider("Temperature (Randomness)", 0.1, 2.0, 0.8, 0.1) [cite: 48]
+    seed = st.sidebar.number_input("Random Seed", value=1337)
+    temperature = st.sidebar.slider("Temperature (Randomness)", 0.1, 2.0, 0.8, 0.1)
     top_k = st.sidebar.slider("Top-K Sampling (Focus)", 1, 50, 10, 1)
     num_to_gen = st.sidebar.number_input("Words to Generate (k)", 1, 100, 20) 
 
@@ -189,15 +189,15 @@ if model:
     np.random.seed(seed)
 
     # --- Main Page ---
-    st.info("Enter some starting text. Words not in the vocabulary will be treated as '<unk>'. [cite: 49]")
+    st.info("Enter some starting text. Words not in the vocabulary will be treated as '<unk>'")
     
     # Set default text based on model
-    default_text = "to be or not to" if 'cat1' in model_path.name else "if ( file is"
+    default_text = "to be or not to" if 'cat1' in model_path else "if ( file is"
     user_input = st.text_area("Enter your context text:", default_text, height=150)
 
     if st.button("Generate"):
         # Tokenize user input
-        if 'cat1' in model_path.name:
+        if 'cat1' in model_path:
             # Natural language: simple split
             tokens = user_input.lower().split()
         else:
