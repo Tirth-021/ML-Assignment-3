@@ -8,7 +8,7 @@ from pathlib import Path
 
 # --- Configuration ---
 # This MUST match the folder where your models are saved.
-ARTIFACTS_DIR = Path("q1_artifacts")
+ARTIFACTS_DIR = Path(".")
 DEFAULT_CONTEXT = 10
 DEFAULT_EMBED_DIM = 128
 DEVICE = "cpu" # Force CPU for compatibility
