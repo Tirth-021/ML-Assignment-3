@@ -153,7 +153,7 @@ def load_model(model_path):
 # ----------------------------------------------------------------------
 
 st.set_page_config(layout="wide")
-st.title("Next-Word Prediction with MLP [Inference-Only]")
+st.title("Next-Word Prediction with MLP")
 
 # --- Sidebar Controls ---
 st.sidebar.title("Controls")
